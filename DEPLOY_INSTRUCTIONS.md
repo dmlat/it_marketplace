@@ -23,7 +23,7 @@
 ### Шаг 1: Подготовка
 ```bash
 # Остановить старые контейнеры
-docker-compose down
+docker compose down
 
 # Удалить старые образы (опционально)
 docker system prune -a
@@ -31,6 +31,8 @@ docker system prune -a
 # Обновить код
 git pull
 ```
+
+> **Важно**: На новых серверах используется `docker compose` (без дефиса) вместо `docker compose`
 
 ### Шаг 2: Создать .env файл
 ```bash
@@ -49,8 +51,17 @@ NODE_ENV=production
 EOF
 ```
 
-### Шаг 3: Обновить зависимости фронтенда
+### Шаг 3: Установить Node.js и обновить зависимости фронтенда
 ```bash
+# Установить Node.js и npm (если не установлены)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Проверить версии
+node --version
+npm --version
+
+# Обновить зависимости фронтенда
 cd frontend
 rm -rf node_modules package-lock.json
 npm install --legacy-peer-deps
@@ -60,13 +71,13 @@ cd ..
 ### Шаг 4: Запустить продакшен
 ```bash
 # Собрать и запустить все сервисы
-docker-compose up -d --build
+docker compose up -d --build
 
 # Проверить статус
-docker-compose ps
+docker compose ps
 
 # Посмотреть логи
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ## 🌐 Доступ к приложению:
@@ -81,7 +92,7 @@ docker-compose logs -f
 ### Если фронтенд не загружается:
 ```bash
 # Проверить статус nginx контейнера
-docker-compose logs frontend
+docker compose logs frontend
 
 # Проверить доступность на порту 80
 curl -I http://localhost
@@ -90,12 +101,12 @@ curl -I http://localhost
 ### Если API не работает:
 ```bash
 # Проверить логи конкретного сервиса
-docker-compose logs users-service
-docker-compose logs companies-service
-docker-compose logs operator-service
+docker compose logs users-service
+docker compose logs companies-service
+docker compose logs operator-service
 
 # Проверить подключение к БД
-docker-compose logs postgres-db
+docker compose logs postgres-db
 ```
 
 ### Если проблемы с БД:
@@ -132,13 +143,13 @@ sudo crontab -e
 ### Проверка здоровья сервисов:
 ```bash
 # Статус всех контейнеров
-docker-compose ps
+docker compose ps
 
 # Использование ресурсов
 docker stats
 
 # Логи в реальном времени
-docker-compose logs -f --tail=100
+docker compose logs -f --tail=100
 ```
 
 ### Backup базы данных:
@@ -162,10 +173,10 @@ docker exec -i itm-postgres-db psql -U itm_user -d itm_production_db < backup_fi
 
 ```bash
 # При изменениях в коде
-git pull && docker-compose up -d --build
+git pull && docker compose up -d --build
 
 # При изменениях в БД (ОСТОРОЖНО!)
-docker-compose down
+docker compose down
 docker volume rm itm_app_postgres-data  # Удалит данные!
-docker-compose up -d --build
+docker compose up -d --build
 ```

@@ -2,9 +2,9 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.production
+      dockerfile: Dockerfile.production.simple
     ports:
-      - "80:80"
+      - "3000:3000"
     networks:
       - itm-network
     depends_on:

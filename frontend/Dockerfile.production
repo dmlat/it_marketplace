@@ -3,12 +3,24 @@ FROM node:18-alpine as build
 
 WORKDIR /usr/src/app
 
-# Копируем package.json и устанавливаем зависимости
-COPY package*.json ./
-RUN npm ci --only=production --legacy-peer-deps
+# Устанавливаем git для некоторых npm пакетов
+RUN apk add --no-cache git
 
-# Копируем исходный код и собираем production build
+# Копируем package.json и package-lock.json (если есть)
+COPY package*.json ./
+
+# Очищаем npm cache и устанавливаем зависимости
+RUN npm cache clean --force
+RUN npm install --legacy-peer-deps --no-optional
+
+# Копируем исходный код
 COPY . .
+
+# Устанавливаем переменные окружения для сборки
+ENV NODE_ENV=production
+ENV GENERATE_SOURCEMAP=false
+
+# Собираем приложение
 RUN npm run build
 
 # Production stage с nginx

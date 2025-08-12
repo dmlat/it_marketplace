@@ -1,0 +1,29 @@
+# Простой production Dockerfile без multi-stage build
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+
+# Устанавливаем serve для раздачи статики
+RUN npm install -g serve
+
+# Копируем package.json
+COPY package*.json ./
+
+# Устанавливаем зависимости
+RUN npm install --legacy-peer-deps
+
+# Копируем исходный код
+COPY . .
+
+# Устанавливаем переменные окружения
+ENV NODE_ENV=production
+ENV GENERATE_SOURCEMAP=false
+
+# Собираем приложение
+RUN npm run build
+
+# Открываем порт
+EXPOSE 3000
+
+# Запускаем статический сервер
+CMD ["serve", "-s", "build", "-l", "3000"]
