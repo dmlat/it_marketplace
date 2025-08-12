@@ -8,7 +8,7 @@ console.log(`   Frontend (React):     http://localhost:3000`);
 console.log(`   Users API:           http://localhost:8001`);
 console.log(`   Companies API:       http://localhost:8003`);
 console.log(`   Operator API:        http://localhost:8002`);
-console.log('   PostgreSQL DB:       localhost:5433');
+console.log('   PostgreSQL DB:       localhost:5500');
 console.log('');
 console.log(`🚀 Основное приложение: http://localhost:3000`);
 console.log('');

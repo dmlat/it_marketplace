@@ -98,7 +98,23 @@ npm run stop    # Остановит все Docker контейнеры
 
 ---
 
-### 6. Проблема: Фронтенд уже запущен на порту 3000
+### 6. Ошибка: `Ports are not available` или `bind: An attempt was made to access a socket in a way forbidden by its access permissions`
+
+- **Симптомы**: Docker не может запустить PostgreSQL на порту 5433/5434, выдает ошибку доступа к порту.
+- **Причина**: Windows динамически резервирует диапазоны портов для Hyper-V и других системных служб. После перезагрузки порт может попасть в заблокированный диапазон.
+- **Диагностика**: Проверить заблокированные диапазоны командой `netsh interface ipv4 show excludedportrange protocol=tcp`
+- **Решение**: 
+  1. **Быстрое**: Использовать порт вне системных диапазонов (например, 5500)
+  2. **Кардинальное**: Изменить диапазон динамических портов Windows:
+     ```cmd
+     # Запустить от администратора:
+     netsh int ipv4 set dynamic tcp start=49152 num=16384
+     netsh int ipv6 set dynamic tcp start=49152 num=16384
+     # Перезагрузить компьютер
+     ```
+  3. **Зарезервировать порт**: `netsh int ipv4 add excludedportrange protocol=tcp startport=5433 numberofports=1`
+
+### 7. Проблема: Фронтенд уже запущен на порту 3000
 
 - **Симптомы**: При запуске `npm run dev` получаете сообщение "Something is already running on port 3000".
 - **Причина**: React приложение уже запущено в другом процессе.

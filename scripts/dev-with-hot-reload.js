@@ -23,7 +23,7 @@ function showUrls() {
   console.log('   Users API:            http://localhost:8001');
   console.log('   Companies API:        http://localhost:8003');
   console.log('   Operator API:         http://localhost:8002');
-  console.log('   PostgreSQL DB:        localhost:5433');
+  console.log('   PostgreSQL DB:        localhost:5500');
   console.log('\n✨ Hot Reload включен для фронтенда!\n');
 }
 

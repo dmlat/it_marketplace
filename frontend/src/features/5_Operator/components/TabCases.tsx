@@ -1,5 +1,6 @@
 import React from 'react';
 import './OperatorTabs.css';
+import './TabCases.css';
 
 const TabCases = () => {
     // Mock-данные
@@ -10,21 +11,30 @@ const TabCases = () => {
     ];
 
     return (
-        <div>
-            <p>Здесь будет содержимое для управления кейсами.</p>
-            <div className="widget">
+        <div className="tab-content">
+            <div className="cases-header">
                 <h3>Кейсы, ожидающие верификации</h3>
-                <ul className="case-list">
-                    {cases.map(c => (
-                        <li key={c.id}>
-                            <div className="case-name">{c.name}</div>
-                            <div className="case-details">
-                                <span><strong>Поставщик:</strong> {c.company}</span>
-                                <span><strong>Контакт:</strong> {c.contact}</span>
+            </div>
+            <div className="cases-list">
+                {cases.map(c => (
+                    <div key={c.id} className="case-item">
+                        <div className="case-item-info">
+                            <div className="case-item-name">{c.name}</div>
+                            <div className="case-item-details">
+                                <strong>Поставщик:</strong> {c.company} <br />
+                                <strong>Контакт:</strong> {c.contact}
                             </div>
-                        </li>
-                    ))}
-                </ul>
+                        </div>
+                        <div className="case-item-actions">
+                            <button className="action-button approve">
+                                <span className="icon">✔</span> Подтвердить
+                            </button>
+                            <button className="action-button reject">
+                                <span className="icon">✖</span> Отклонить
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

@@ -112,7 +112,7 @@ npm run stop
 - **Users API:** http://localhost:8001
 - **Companies API:** http://localhost:8003
 - **Operator API:** http://localhost:8002
-- **PostgreSQL DB:** localhost:5433
+- **PostgreSQL DB:** localhost:5500
 
 ## 🚨 Важные моменты:
 
