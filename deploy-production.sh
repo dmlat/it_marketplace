@@ -15,13 +15,11 @@ docker system prune -f
 echo "🔨 Сборка фронтенда на хосте..."
 cd frontend
 
-# Убедиться что зависимости установлены
-echo "📥 Проверка зависимостей..."
-if [ ! -d "node_modules" ]; then
-    echo "📦 Установка зависимостей..."
-    rm -f package-lock.json
-    npm install --legacy-peer-deps
-fi
+# Полная переустановка зависимостей для исправления конфликтов
+echo "📦 Переустановка зависимостей..."
+rm -rf node_modules package-lock.json
+npm cache clean --force
+npm install --legacy-peer-deps --force
 
 # Собрать production build
 echo "🏗️ Сборка production build..."
