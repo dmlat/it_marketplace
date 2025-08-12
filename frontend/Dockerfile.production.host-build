@@ -2,7 +2,7 @@
 FROM nginx:alpine
 
 # Копируем готовую сборку (которую соберем на хосте)
-COPY build /usr/share/nginx/html
+COPY ./build /usr/share/nginx/html
 
 # Копируем конфигурацию nginx (но не будем её использовать, так как у вас уже настроен внешний nginx)
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
