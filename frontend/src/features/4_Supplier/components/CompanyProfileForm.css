@@ -1,0 +1,43 @@
+.company-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.company-profile-form h2 {
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.company-profile-form input,
+.company-profile-form textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Важно для корректной ширины */
+}
+
+.company-profile-form textarea {
+    grid-column: 1 / -1; /* Занимает всю ширину */
+    min-height: 120px;
+    resize: vertical;
+}
+
+.company-profile-form button {
+    padding: 0.8rem 1.5rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    align-self: flex-start; /* Кнопка не растягивается */
+}

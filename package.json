@@ -1,0 +1,33 @@
+{
+  "name": "itm-marketplace-mvp",
+  "version": "1.0.0",
+  "description": "IT Marketplace 'Domestic Solutions' - Root project for managing services and frontend.",
+  "scripts": {
+    "postinstall": "cd services/users-service && npm install && cd ../companies-service && npm install && cd ../operator-service && npm install && cd ../../frontend && npm install",
+    "dev": "node scripts/dev-with-hot-reload.js",
+    "dev:build": "npm run services:build && npm run frontend:start",
+    "dev:fresh": "npm run services:fresh && npm run frontend:start",
+    "services:start": "docker-compose -f docker-compose.dev.yml up -d && node scripts/show-urls.js",
+    "services:build": "docker-compose -f docker-compose.dev.yml up --build -d && node scripts/show-urls.js",
+    "services:fresh": "docker-compose -f docker-compose.dev.yml down -v && docker-compose -f docker-compose.dev.yml up --build -d && node scripts/show-urls.js",
+    "frontend:start": "cd frontend && npm start",
+    "stop": "docker-compose -f docker-compose.dev.yml down",
+    "status": "docker-compose ps",
+    "restart:users": "docker-compose restart users-service",
+    "logs:users": "docker-compose -f docker-compose.dev.yml logs -f users-service",
+    "logs:db": "docker-compose -f docker-compose.dev.yml logs -f postgres-db",
+    "logs:services": "docker-compose -f docker-compose.dev.yml logs -f users-service companies-service operator-service"
+  },
+  "keywords": [
+    "marketplace",
+    "react",
+    "nodejs",
+    "docker",
+    "microservices"
+  ],
+  "author": "AI Assistant & User",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
+}
