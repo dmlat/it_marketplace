@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =================================================================
+// Модели данных
+// =================================================================
+
+enum UserRole {
+  customer
+  supplier
+  operator
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password_hash String
+  role          UserRole
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  company                Company?
+  confirmedGrants        OperatorConfirmedGrant[]
+  supportMeasuresFacts   SupportMeasuresFact[]
+
+  @@map("users")
+}
+
+model Company {
+  id                   Int      @id @default(autoincrement())
+  user_id              Int      @unique
+  name                 String
+  full_name            String?
+  foundation_year      Int?
+  inn                  String   @unique
+  region               String?
+  description          String?
+  notify_on_new_orders Boolean? @default(false)
+  website_url          String?
+  it_associations      String[]
+  logo_url             String?
+  ogrn                 String?
+  kpp                  String?
+  legal_address        String?
+  legal_form           String?
+  registration_date    DateTime? @db.Date
+  okved                String?
+  employees_count_2022 Int?
+  employees_count_2023 Int?
+  revenue_2022         Decimal? @db.Decimal(15, 2)
+  revenue_2023         Decimal? @db.Decimal(15, 2)
+  company_size         String?
+  company_status       String?
+  actual_address       String?
+  company_type         String[]
+  activity_direction   String?
+  gorky_tech_participation String?
+  has_own_solution     String?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  user                  User                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  contacts              CompanyContact?
+  operatorConfirmedGrants OperatorConfirmedGrant[]
+  surveySupportAnswers  SurveySupportAnswers?
+  supportMeasuresFacts  SupportMeasuresFact[]
+
+  @@map("companies")
+}
+
+model CompanyContact {
+  id         Int      @id @default(autoincrement())
+  company_id Int      @unique
+  full_name  String?
+  position   String?
+  phone      String?
+  email      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  company Company @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("company_contacts")
+}
+
+model OperatorConfirmedGrant {
+  id                       Int      @id @default(autoincrement())
+  company_id               Int
+  measure_type             String
+  description              String
+  grant_amount             Decimal  @db.Decimal(15, 2)
+  grant_year               Int
+  confirmed_by_operator_id Int
+  confirmed_at             DateTime? @default(now())
+
+  company Company @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  operator User    @relation(fields: [confirmed_by_operator_id], references: [id])
+
+  @@map("operator_confirmed_grants")
+}
+
+model SurveySupportAnswers {
+  id                     Int       @id @default(autoincrement())
+  company_id             Int       @unique
+  is_aware               Boolean?
+  main_interest          String[]
+  used_federal           String[]
+  used_regional          String[]
+  startup_plans          String?
+  attracting_specialists Boolean?
+  created_at             DateTime? @default(now())
+  updated_at             DateTime? @updatedAt
+
+  company Company @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("survey_support_answers")
+}
+
+model SupportMeasuresFact {
+  id                       Int       @id @default(autoincrement())
+  company_id               Int
+  used_support             Boolean?
+  federal_support_types    String[]
+  regional_support_types   String[]
+  measure_type             String?
+  description              String?
+  grant_amount             Decimal?  @db.Decimal(15, 2)
+  grant_year               Int?
+  confirmed_by_operator_id Int?
+  confirmed_at             DateTime? @default(now())
+
+  company  Company @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  operator User?   @relation(fields: [confirmed_by_operator_id], references: [id])
+
+  @@map("support_measures_facts")
+}

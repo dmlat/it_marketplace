@@ -1,95 +1,58 @@
 services:
   postgres-db:
     image: postgres:14-alpine
-    container_name: itm-postgres-db
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      POSTGRES_DB: ${POSTGRES_DB:-itm_db}
+    container_name: itm-postgres-db-dev
+    restart: unless-stopped
     ports:
-      - "5500:5432"
+      # Формат: HOST_PORT:CONTAINER_PORT
+      # 5434 - порт на вашем компьютере (localhost), по которому можно подключиться к БД.
+      # 5432 - стандартный порт PostgreSQL внутри контейнера.
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - itm-network
+      - postgres-data-dev:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DB:-itm_db}"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
       timeout: 5s
       retries: 5
 
-  users-service:
+  backend:
     build:
-      context: ./services/users-service
-      dockerfile: Dockerfile
-    container_name: itm-users-service
-    restart: on-failure
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: itm-backend-dev
+    restart: unless-stopped
     ports:
-      - "8001:8001"
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: development
+    volumes:
+      - ./backend/src:/usr/src/app/src
+      - ./backend/prisma:/usr/src/app/prisma
     depends_on:
       postgres-db:
         condition: service_healthy
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@postgres-db:5432/${POSTGRES_DB:-itm_db}
-      - NODE_ENV=development
-      - JWT_SECRET=${JWT_SECRET}
-    volumes:
-      - ./services/users-service:/usr/src/app
-      - /usr/src/app/node_modules
-    command: npm run dev
-    networks:
-      - itm-network
 
-  operator-service:
+  frontend:
     build:
-      context: ./services/operator-service
-      dockerfile: Dockerfile
-    container_name: itm-operator-service
-    restart: on-failure
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: itm-frontend-dev
+    restart: unless-stopped
     ports:
-      - "8002:8002"
-    depends_on:
-      postgres-db:
-        condition: service_healthy
+      - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@postgres-db:5432/${POSTGRES_DB:-itm_db}
-      - NODE_ENV=development
-      - JWT_SECRET=${JWT_SECRET}
+      NODE_ENV: development
     volumes:
-      - ./services/operator-service:/usr/src/app
+      - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run dev
-    networks:
-      - itm-network
-
-  companies-service:
-    build:
-      context: ./services/companies-service
-      dockerfile: Dockerfile
-    container_name: itm-companies-service
-    restart: on-failure
-    ports:
-      - "8003:8003"
-    depends_on:
-      postgres-db:
-        condition: service_healthy
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@postgres-db:5432/${POSTGRES_DB:-itm_db}
-      - NODE_ENV=development
-      - JWT_SECRET=${JWT_SECRET}
-    volumes:
-      - ./services/companies-service:/usr/src/app
-      - /usr/src/app/node_modules
-    command: npm run dev
-    networks:
-      - itm-network
-
-networks:
-  itm-network:
-    driver: bridge
+      - /usr/src/app/.next
 
 volumes:
-  postgres-data:
-    driver: local
+  postgres-data-dev:
